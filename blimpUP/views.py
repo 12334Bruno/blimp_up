@@ -1,7 +1,4 @@
-from glob import escape
-from re import T
 from statistics import mean
-from tkinter.tix import Tree
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.db.models.query import RawQuerySet
@@ -15,8 +12,6 @@ import os
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
-import imghdr
 from .forms import *
 from blimpUP.models import *
 from json import dumps, loads
