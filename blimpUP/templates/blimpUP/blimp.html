@@ -1,0 +1,184 @@
+{% extends 'blimpUP/layout.html' %}
+
+{% block script %}
+<script>
+    var data = JSON.parse("{{data|escapejs}}");
+</script>
+{% endblock %}
+
+{% block body %}
+    {{ message|safe }}
+    {% if not message %}
+        
+        <div id="page-body">
+            <div id="blimp-img-container">
+                <img class="mySlides" id="blimp-img" src="{{ blimp.image.url }}" alt="img">
+                <div class="mySlides" id="map"></div>
+            </div>
+            <div id="slide-show-bar">
+                <button class="next selected-button" onclick="plusDivs(+1, this, this.nextElementSibling)">Image</button>
+                <button class="prev" onclick="plusDivs(-1, this, this.previousElementSibling)">Map</button>
+            </div>
+        </div>
+        {% if accepted %}
+            <div class="alert alert-success alert-dismissible fade show" id="blimp-requestalert">
+                <b>Success!</b>&nbsp;Your request was approved.
+                <button type="button" class="btn btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+        <div id="page-body">
+            <div id="page-container" class="blimp-container">
+                <div class="blimp-info" id="blimp-blimpname"><b>Name:</b> {{ blimp.blimpname }}</div>
+                <div class="blimp-info" id="blimp-price"><b>Price:</b> ${{ blimp.price }}</div>
+                <div class="blimp-info" id="blimp-capacity">
+                    <div style="white-space: pre;display: flex;flex-wrap: nowrap;">
+                        <span class="material-icons">groups</span> {{ blimp.filled_capacity }}/{{ blimp.capacity }}
+                    </div>
+                </div>
+                <div class="blimp-info" id="blimp-dock"><b>Dock:</b> {{ blimp.dock }}</div>
+                <div class="blimp-info" id="blimp-rating"><b>Average rating:</b> {% if blimp.average_rating == None %}
+                    No ratings yet
+                    {% else %}{{ blimp.average_rating }}<img class="blimp-rating" class="review-star" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'><path fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/></svg>">
+                     ({{ blimp.reviews.count }} in total){% endif %}</div>
+                <div class="blimp-info" id="blimp-description"><b>Description: </b>{{ blimp.description }}</div>
+                <div class="blimp-info" id="blimp-status" style="display: flex; flex-wrap: nowrap;"><b>Status:</b>
+                    {% if blimp.status == 'waiting' %}
+                    <div class="blimp-available blimppill" style="position: relative; background-color: rgb(55, 55, 255);">
+                        Available
+                    {% else %}
+                    <div class="blimp-notavailable blimppill" style="position: relative;">
+                        Not Available
+                    {% endif %}
+                        </div>
+                </div>
+                <div class="blimp-info" id="blimp-owner"><b>Owner:</b> {{ blimp.owner }}</div>
+                {% if request.user == blimp.owner %}
+                    <form id="blimp-editbtn" action="{% url 'edit_blimp' id=blimp.id %}" method="GET">
+                        <button type="submit" class="btn btn-outline-primary">Edit blimp</button>
+                    </form>
+                {% endif %}
+
+                {% if request.user != blimp.owner %}
+                    {% if blimp.filled_capacity != blimp.capacity and blimp.status != "in_use" or request.user in passengers and blimp.status != "in_use" %}
+                        <button id="blimp-signupbtn" onclick="sign_up()" class="btn btn-warning">
+                            {% if request.user in passengers %}
+                                {% if accepted %}
+                                    Cancel trip
+                                {% else %}
+                                    Remove request
+                                {% endif %}
+                            {% else %}
+                                Request flight
+                            {% endif %}
+                        </button>
+                    {% endif %}
+                {% elif blimp.status == 'waiting' %}
+                    <button id="blimp-tripbtn" onclick="trip_action()" type="submit" class="btn btn-primary">Start trip</button>
+                {% else %}
+                    <button id="blimp-tripbtn" onclick="trip_action()" type="submit" class="btn btn-primary">End trip</button>
+                {% endif %}
+            </div>
+            <!-- Star review Html and Css from https://codepen.io/knyttneve/pen/EBNqPN by Mert Cukuren -->
+            <div class="container">
+                {% if request.user != blimp.owner and can_review %}
+                    <form class="feedback" method="POST" action="{% url 'review' id=blimp.id %}">
+                        {% csrf_token %}
+                        <h1>Review your trip!</h1>
+                        <div class="rating">
+                            <input class="star-rating" type="radio" name="rating" id="rating-5" value=5>
+                            <label for="rating-5"></label>
+                            <input class="star-rating" type="radio" name="rating" id="rating-4" value=4>
+                            <label for="rating-4"></label>
+                            <input class="star-rating" type="radio" name="rating" id="rating-3" value=3>
+                            <label for="rating-3"></label>
+                            <input class="star-rating" type="radio" name="rating" id="rating-2" value=2>
+                            <label for="rating-2"></label>
+                            <input class="star-rating" type="radio" name="rating" id="rating-1" value=1>
+                            <label for="rating-1"></label>
+                            <input hidden checked class="star-rating" type="radio" name="rating" value=0>
+                        </div> 
+                        <textarea class="form-control review-form" name="comment" placeholder="Your review" maxlength="300"></textarea>
+                        <input class="btn btn-primary review-submit" type="submit"value="Submit">
+                    </form>
+                {% endif %}
+            </div>
+            
+                <div id="blimp-reviews-container">
+                    <div id="reviews-top">
+                        {% if reviews.paginator.count != 0 %}
+                            <h1 id="reviews-title">Other user reviews:</h1>
+                        {% else %}
+                            <h1 id="reviews-title">No reviews found.</h1>
+                        {% endif %}
+
+                        <form id="blimp-filter-form" onsubmit="filter_reviews(event)">
+                            <select id="blimp-filter-select" name="filter_option" class="form-control" value="AHAHAHAHA">
+                                <option type="radio" selected disabled value="">Filter Options</option>
+                                <option type="radio" value="newest">Newest</option>
+                                <option type="radio" value="oldest">Oldest</option>
+                                <option type="radio" value="0">No Stars</option>
+                                <option type="radio" value="1">1 Star</option>
+                                <option type="radio" value="2">2 Stars</option>
+                                <option type="radio" value="3">3 Stars</option>
+                                <option type="radio" value="4">4 Stars</option>
+                                <option type="radio" value="5">5 Stars</option>
+                            </select>
+                            <input class="btn btn-primary" type="submit" value="Filter by">
+                        </form>
+                    </div>
+                {% if reviews.paginator.count != 0 %}
+                    <div class="reviews-container">
+                        {% for review in reviews %}
+                            <div class="review">
+                                
+                                <div class="review-rating">
+                                    {% if review.rating < 1 %}
+                                        {% for item in rating_list %}
+                                            <img class="review-star" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'><path fill='%23e3e3e3' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/></svg>">    
+                                        {% endfor %}
+                                    {% else %}
+                                        <img class="review-star" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'><path fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/></svg>">
+                                        {% for item in rating_list %}
+                                            {% if item < review.rating %}
+                                                <img class="review-star" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'><path fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/></svg>">
+                                            {% elif item > review.rating %}
+                                                <img class="review-star" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'><path fill='%23e3e3e3' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/></svg>">    
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div> 
+
+                                <div class="review-user">{{ review.user }}</div>
+                                <div class="review-date">{{ review.datetime }}</div>
+                                <div class="review-comment">{{ review.comment }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if reviews.paginator.num_pages != 1 %}
+                    <nav aria-label="Page navigation example" id="blimp-pagination">
+                        <ul class="pagination">
+                            <li id="blimps-pagination-previous" class="page-item">
+                            {% if reviews.has_previous %}
+                                <a class="page-link add_filter" href="?page=">«</a></li>
+                                <li class="page-item"><a class="page-link add_filter" href="?page={{ reviews.previous_page_number }}">‹</a>
+                            {% endif %}
+                            </li>
+
+                            <li class="page-item"><a class="page-link num-pages">Page
+                                <form id="num-pages-form" onsubmit="reviews_page(event)"><input id="num-pages-input" type="number" step="1" value="{{ reviews.number }}"></form>
+                             / {{ reviews.paginator.num_pages }}.</a></li>
+
+                            <li id="posts-pagination-next" class="page-item">
+                            {% if reviews.has_next %}
+                                <a class="page-link add_filter" href="?page={{ reviews.next_page_number }}">›</a></li>
+                                <li class="page-item"><a class="page-link add_filter" class="add_filter" href="?page={{ reviews.paginator.num_pages }}">»</a>
+                            {% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endif %}
+        </div> 
+    {% endif %}
+{% endblock %}

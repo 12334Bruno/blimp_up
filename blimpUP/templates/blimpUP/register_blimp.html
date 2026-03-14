@@ -1,0 +1,68 @@
+{% extends 'blimpUP/layout.html' %}
+
+{% block script %}
+    <script>
+        var data = JSON.parse("{{data|escapejs}}");
+    </script>
+{% endblock %}
+
+{% block body %}
+    {{ form.non_field_errors }}
+    
+    <div id="page-body">
+        <div id="page-container">
+            {% if blimp %}
+                <form action="{% url 'edit_blimp' id=blimp.id %}" method="POST" enctype ="multipart/form-data">
+            {% else %}
+                <form action="{% url 'register_blimp' %}" method="POST" enctype ="multipart/form-data">
+            {% endif %}
+                {% csrf_token %}
+                <div class="form-group">
+                    <input autofocus class="form-control" maxlength="100" type="text" name="blimpname" placeholder="Name" value="{{ form.blimpname.value }}">
+                    {{ form.blimpname.errors }}
+                </div>
+                <div class="form-group">
+                    <input class="form-control" maxlength="80" type="text" name="dock" placeholder="Dock" value="{{ form.dock.value }}">
+                    {{ form.dock.errors }}
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="number" step="1" name="capacity" max="9999" placeholder="Capacity" value="{{ form.capacity.value }}">
+                    {{ form.capacity.errors }}
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="number" step="0.01" name="price" max="1000000000" placeholder="Price" value="{{ form.price.value }}">
+                    {{ form.price.errors }}
+                </div>
+                <div class="form-group">
+                    <textarea id="rb-textarea" class="form-control" name="description" maxlength="1000" placeholder="Description and Contact information">{{ form.description.value }}</textarea>
+                    {{ form.description.errors }}
+                </div>
+                <div class="form-group">
+                    <label>Higher resolution is recommended for images</label>
+                    <div class="custom-file">
+                        <input type="file" class="form-control" id="customFile" name="image"/>
+                        {{ form.image.errors }}
+                    </div>
+                </div>
+                <input name="longitude" id="map-coords-lng" type="text" value="{{ form.longitude.value }}" hidden>
+                <input name="latitude" id="map-coords-lat" type="text" value="{{ form.latitude.value }}" hidden>
+                <div id="map-header">Drag and click on the map to set the blimps location</div>
+                <div id="register-blimp-map-container">
+                    <div id="map" class="register-blimp-map" {% if form.longitude.errors %}style="border: 1px solid red"{% endif %}></div>
+                </div>
+                <div id="map-error">{{ form.longitude.errors }}</div>
+                <div id="btns-field">
+                    {% if blimp %}
+                        <a class="btn btn-danger btndelete" href="{% url 'delete_blimp' id=blimp.id %}">Delete blimp</a>
+                        <a class="btn btn-secondary btncancel" href="{% url 'blimp' id=blimp.id %}">Cancel</a>
+                        <input class="btn btn-primary btnconfrim" type="submit" value="Save">
+                    {% else %}
+                        <a class="btn btn-secondary btncancel" href="{% url 'index' %}">Cancel</a>
+                        <input class="btn btn-primary btnconfrim" type="submit" value="Register Blimp">
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

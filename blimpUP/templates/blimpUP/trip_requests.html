@@ -1,0 +1,35 @@
+{% extends "blimpUP/layout.html" %}
+
+
+{% block body %}
+    {{ message|safe }}
+    <div id="page-body">
+        <div id="page-container" style="padding-top: 0px; padding-bottom: 0px;">
+            <span style="height: 0px;"></span>
+            {% for trip_request in trip_requests %}
+                <div class="request-info">
+                    <div class="triprequest-content">
+                        <b>{{ trip_request.user }}</b>&nbsp;requests a seat on the blimp:&nbsp;<b>{{ trip_request.blimp.blimpname }}</b>
+                    </div>
+                    
+                    <div class="requests-btns">
+                        <form class="requests-form">
+                            <input type="text" name="id" hidden value="{{ trip_request.blimp.id }}">
+                            <input type="text" name="username" hidden value="{{ trip_request.user.username }}">
+                            <input type="text" name="choice" hidden value="accept">
+                            <button onclick="trip_requests(event)" class="btn btn-success request-btn">Accept</button>
+                        </form>
+                        <form class="requests-form">
+                            <input type="text" name="id" hidden value="{{ trip_request.blimp.id }}">
+                            <input type="text" name="username" hidden value="{{ trip_request.user.username }}">
+                            <input type="text" name="choice" hidden value="decline">
+                            <button onclick="trip_requests(event)" class="btn btn-danger request-btn">Decline</button>
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="height: 60px; text-align: center; top: 17px"><b>There are no current requests.</b></div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

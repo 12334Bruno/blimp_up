@@ -1,0 +1,52 @@
+{% extends "blimpUP/layout.html" %}
+
+
+{% block body %}
+
+    <div id="page-body">
+        <div id="page-container">
+            <div id="register-container">
+                <h2>Register</h2>
+
+                {% if message %}
+                    <div>{{ message }}</div>
+                {% endif %}
+
+                <form action="{% url 'register' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input class="form-control" autofocus type="text" name="username" placeholder="Username" value="{{ form.username.value }}">
+                        {{ form.username.errors }}
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="email" name="email" placeholder="Email Address" value="{{ form.email.value }}">
+                        {{ form.email.errors }}
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="password" placeholder="Password" value="{{ form.password.value }}">
+                        {{ form.password.errors }}
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password" value="{{ form.confirmation.value }}">
+                        {{ form.confirmation.errors }}
+                    </div>
+                    <div class="form-group">
+                        <select name="account_type" class="form-control" value="{{ form.account_type.value }}">
+                            <option style="color: gray" {% if selected == False %}selected{% endif %} disabled>Account type...</option>
+                            <option value="owner" {% if selected == "owner" %}selected{% endif %}>Owner of a blimp</option>
+                            <option value="passenger" {% if selected == "passenger" %}selected{% endif %}>Passenger</option>
+                        </select>
+                        {{ form.account_type.errors }}
+                    </div>
+                    <div id="btns-field">
+                        <a class="btn btn-secondary btncancel" href="{% url 'index' %}">Cancel</a>
+                        <input class="btn btn-primary btnconfrim" type="submit" value="Register">
+                    </div>
+                </form>
+
+                Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "blimpUP/layout.html" %}
+
+
+{% block body %}
+    {{ message|safe }}
+    <div id="page-body">
+        <div id="page-container" style="padding-bottom: 0px;">
+            {% for trip in trips %}
+                <div class="request-content">
+                    {% if trip.status == "accepted" %}
+                        <div class="alert alert-success alert-dismissible fade show" class="mytrips">
+                            <b>Success!</b>&nbsp;Your request to <a style="color: rgb(68, 88, 53)" href="{% url 'blimp' id=trip.blimp.id %}"><b>{{ trip.blimp.blimpname }}</b></a> was approved.
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning alert-dismissible fade show" class="mytrips">
+                            Your request to <a style="color: rgb(68, 88, 53)" href="{% url 'blimp' id=trip.blimp.id %}"><b>{{ trip.blimp.blimpname }}</b></a> is wating for approval.
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div id="mytrips-notrips"><b>You have no current trips.</b></div>
+            {% endfor %}
+        </div> 
+    </div>
+{% endblock %}

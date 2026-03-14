@@ -1,0 +1,84 @@
+{% extends 'blimpUP/layout.html' %}
+
+{% block script %}
+<script>
+    var data = JSON.parse("{{data|escapejs}}");
+</script>
+{% endblock %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block body %}
+    {{ message|safe }}
+    {% if pagin_blimps.number == 1 %}
+        <div id="home-map-blimps">
+            <div id="map"></div>
+        </div>
+    {% endif %}
+    <div id="home-container">
+        {% for blimp in blimps %}
+            <a class="blimp-post-link" href="{% url 'blimp' id=blimp.0.id %}">
+                <div class="blimp-post">
+                    <div class="blimp-post-container">
+                        <img class="blimp-post-img" src="{{ blimp.0.image.url }}" style="width:100%;height: 250px; object-fit: cover;" alt="img">
+
+                        {% if blimp.1 != False %}
+                            {% if blimp.1.status == 'awaiting' %}
+                                <div class="blimp-available" style="background-color: rgb(255, 189, 6);">Awaiting response</div>
+                            {% else %}
+                                <div class="blimp-available">Signed up</div>
+                            {% endif %}
+                        {% else %}
+                            {% if blimp.0.status == 'waiting' %}
+                                <div class="blimp-available" style="background-color: rgb(55, 55, 255);">Available</div>
+                            {% else %}
+                                <div class="blimp-notavailable">Not Available</div>
+                            {% endif %}
+                        {% endif %}
+                        <div class="blimp-capacity" style="display: flex;">
+                            <div><b>{{ blimp.0.filled_capacity }}/{{ blimp.0.capacity }}</b></div>
+                            <span style="display: block; margin-left: 0.2rem;" class="material-icons">groups</span>
+                        </div>
+                        <div class="blimp-price"><b>${{ blimp.0.price }}</b> per trip</div>
+                        <div class="blimp-averagerating">
+                            {% if blimp.0.average_rating == None %}
+                                <b>No ratings</b>
+                            {% else %}
+                                <b>{{ blimp.0.average_rating }}</b><img class="blimp-rating" class="review-star" src="data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'><path fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/></svg>">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+                <div id="page-container" style="grid-column: 1/4; margin-top: -150px;">
+                    <div style="height: 60px; text-align: center; top: 17px;"><b>{% if my_blimps %}You have no blimps.{% else %}There are no blimps.{% endif %}</b></div>
+                </div>
+        {% endfor %}
+    </div>
+    {% if pagin_blimps.paginator.num_pages != 1 %}
+        <nav aria-label="Page navigation example" id="blimps-pagination">
+            <ul class="pagination">
+                <li id="blimps-pagination-previous" class="page-item">
+                {% if pagin_blimps.has_previous %}
+                    <a class="page-link" href="?page=1">«</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ pagin_blimps.previous_page_number }}">‹</a>
+                {% endif %}
+                </li>
+
+                <li class="page-item"><a class="page-link num-pages">Blimp page 
+                    <form id="num-pages-form" onsubmit="reviews_page(event)"><input id="num-pages-input" type="number" step="1" value="{{ pagin_blimps.number }}"></form>
+                 of {{ pagin_blimps.paginator.num_pages }}.</a></li>
+                <li id="posts-pagination-next" class="page-item">
+
+                {% if pagin_blimps.has_next %}
+                    <a class="page-link" href="?page={{ pagin_blimps.next_page_number }}">›</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ pagin_blimps.paginator.num_pages }}">»</a>
+                {% endif %}
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endblock %}
