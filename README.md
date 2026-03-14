@@ -1,5 +1,5 @@
 # Overview
-In this porject users can explore available blimps, request trips, and manage bookings within a simulated environment. The system supports two types of accounts, passengers and owners, each with different permissions and capabilities.
+In this project users can explore available blimps, request trips, and manage bookings within a simulated environment. The system supports two types of accounts, passengers and owners, each with different permissions and capabilities.
 
 Passengers can browse blimps, request flights, and leave reviews after completing trips. Owners have additional privileges, including creating and managing their own blimps and handling incoming trip requests.
 
