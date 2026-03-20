@@ -1,4 +1,8 @@
 # Overview
+
+Click below to watch a showcase video of the app:
+[![Watch the video](https://img.youtube.com/vi/nsW_9k3Kpl8/0.jpg)](https://youtu.be/nsW_9k3Kpl8)
+
 In this project users can explore available blimps, request trips, and manage bookings within a simulated environment. The system supports two types of accounts, passengers and owners, each with different permissions and capabilities.
 
 Passengers can browse blimps, request flights, and leave reviews after completing trips. Owners have additional privileges, including creating and managing their own blimps and handling incoming trip requests.
