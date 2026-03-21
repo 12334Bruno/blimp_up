@@ -1,3 +1,5 @@
+Note: this project was built in 2022, but uploaded to GitHub in 2026 for documentation
+
 # Overview
 
 Click below to watch a showcase video of the app:
