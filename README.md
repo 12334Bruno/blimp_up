@@ -2,7 +2,7 @@ Note: this project was built in 2022, but uploaded to GitHub in 2026 for documen
 
 # Overview
 
-Click below to watch a showcase video of the app:
+Click below to watch a video showcase of the app:
 [![Watch the video](https://img.youtube.com/vi/nsW_9k3Kpl8/0.jpg)](https://youtu.be/nsW_9k3Kpl8)
 
 In this project users can explore available blimps, request trips, and manage bookings within a simulated environment. The system supports two types of accounts, passengers and owners, each with different permissions and capabilities.
